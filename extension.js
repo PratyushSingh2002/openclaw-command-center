@@ -210,7 +210,7 @@ class OpenClawIndicator extends PanelMenu.Button {
         commandScroll.set_child(commandGrid);
         root.add_child(commandScroll);
 
-        this._appendMessage('system', 'Type a message to run `openclaw agent --message`, or use any OpenClaw command as `/command args`.');
+        this._appendMessage('system', 'Type a message to run `openclaw agent --agent main --message`, or use any OpenClaw command as `/command args`.');
     }
 
     _commandButton(command, description) {
@@ -282,6 +282,11 @@ class OpenClawIndicator extends PanelMenu.Button {
         const recipient = this._settings.get_string('default-recipient').trim();
         if (recipient)
             argv.push('--to', recipient);
+        else {
+            const agentId = this._settings.get_string('default-agent-id').trim();
+            if (agentId)
+                argv.push('--agent', agentId);
+        }
         if (this._settings.get_boolean('deliver-agent-replies'))
             argv.push('--deliver');
 

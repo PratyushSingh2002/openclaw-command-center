@@ -11,6 +11,11 @@
       <summary>Default recipient</summary>
       <description>Optional recipient passed as --to for plain chat messages.</description>
     </key>
+    <key name="default-agent-id" type="s">
+      <default>'main'</default>
+      <summary>Default agent id</summary>
+      <description>Agent id passed as --agent for plain chat messages when no default recipient is configured.</description>
+    </key>
     <key name="deliver-agent-replies" type="b">
       <default>false</default>
       <summary>Deliver agent replies</summary>

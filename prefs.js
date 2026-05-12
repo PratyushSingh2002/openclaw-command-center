@@ -33,6 +33,15 @@ export default class OpenClawMiniChatPreferences extends ExtensionPreferences {
         });
         group.add(commandRow);
 
+        const agentRow = new Adw.EntryRow({
+            title: _('Default agent for plain chat'),
+            text: settings.get_string('default-agent-id'),
+        });
+        agentRow.connect('changed', row => {
+            settings.set_string('default-agent-id', row.get_text().trim());
+        });
+        group.add(agentRow);
+
         const recipientRow = new Adw.EntryRow({
             title: _('Default recipient for plain chat'),
             text: settings.get_string('default-recipient'),
