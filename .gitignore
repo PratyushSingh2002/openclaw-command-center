@@ -1,0 +1,21 @@
+# Local Codex/agent workspace files
+.agents/
+.codex/
+
+# GNOME Shell build/package outputs
+dist/
+*.shell-extension.zip
+schemas/gschemas.compiled
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*~
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
