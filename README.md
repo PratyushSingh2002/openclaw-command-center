@@ -13,7 +13,7 @@ GNOME Shell extension for interacting with OpenClaw from the top panel without o
 ## Install locally
 
 ```bash
-cd ~/Desktop/gnome-extension
+cd ~/Desktop/openclaw-command-center
 ./install-local.sh
 gnome-extensions enable openclaw-mini-chat@local
 ```
@@ -23,7 +23,7 @@ On Wayland, log out and back in after installing or updating. On X11, `Alt`+`F2`
 ## Package
 
 ```bash
-cd ~/Desktop/gnome-extension
+cd ~/Desktop/openclaw-command-center
 ./pack.sh
 ```
 
