@@ -368,14 +368,29 @@ class OpenClawIndicator extends PanelMenu.Button {
                 style_class: `openclaw-message openclaw-message-${message.kind}`,
                 x_expand: true,
             });
-            bubble.add_child(wrappedLabel({
+
+            const header = new St.BoxLayout({
+                style_class: 'openclaw-message-header',
+                x_expand: true,
+            });
+            header.add_child(wrappedLabel({
                 text: message.kind === 'user'
                     ? _('You')
                     : message.kind === 'error'
                         ? _('OpenClaw error')
                         : _('OpenClaw'),
                 style_class: 'openclaw-message-role',
+                x_expand: true,
             }));
+            const copyButton = new St.Button({
+                label: _('Copy'),
+                can_focus: true,
+                style_class: 'openclaw-copy-button',
+            });
+            copyButton.connect('clicked', () => this._copyMessage(message.text));
+            header.add_child(copyButton);
+            bubble.add_child(header);
+
             bubble.add_child(wrappedLabel({
                 text: message.text,
                 style_class: 'openclaw-message-text',
@@ -383,6 +398,16 @@ class OpenClawIndicator extends PanelMenu.Button {
             }));
             this._historyBox.add_child(bubble);
         }
+    }
+
+    _copyMessage(text) {
+        St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, text);
+        this._statusLabel.text = _('Copied');
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1500, () => {
+            if (!this._currentProcess)
+                this._statusLabel.text = _('Ready');
+            return GLib.SOURCE_REMOVE;
+        });
     }
 });
 
