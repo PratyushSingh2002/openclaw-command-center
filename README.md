@@ -1,0 +1,30 @@
+# OpenClaw Mini Chat
+
+GNOME Shell extension for interacting with OpenClaw from the top panel without opening a terminal.
+
+## Features
+
+- Adds an `OC` panel button with a dropdown mini chat.
+- Sends plain text as `openclaw --no-color agent --message "..."`.
+- Runs OpenClaw slash commands directly, for example `/status`, `/doctor`, or `/message send --target +15555550123 --message "Hi"`.
+- Shows recent replies in the dropdown and includes all top-level commands from `openclaw --help`.
+- Includes preferences for the OpenClaw executable, default plain-chat recipient, `--deliver`, and history length.
+
+## Install locally
+
+```bash
+cd ~/Desktop/gnome-extension
+./install-local.sh
+gnome-extensions enable openclaw-mini-chat@local
+```
+
+On Wayland, log out and back in after installing or updating. On X11, `Alt`+`F2`, then `r`, then Enter usually reloads GNOME Shell.
+
+## Package
+
+```bash
+cd ~/Desktop/gnome-extension
+./pack.sh
+```
+
+The archive is written to `dist/openclaw-mini-chat@local.shell-extension.zip`.
