@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.openclaw-mini-chat" path="/org/gnome/shell/extensions/openclaw-mini-chat/">
+    <key name="openclaw-command" type="s">
+      <default>'/home/pratyush/n/bin/openclaw'</default>
+      <summary>OpenClaw executable</summary>
+      <description>Command or absolute path used to run OpenClaw.</description>
+    </key>
+    <key name="default-recipient" type="s">
+      <default>''</default>
+      <summary>Default recipient</summary>
+      <description>Optional recipient passed as --to for plain chat messages.</description>
+    </key>
+    <key name="deliver-agent-replies" type="b">
+      <default>false</default>
+      <summary>Deliver agent replies</summary>
+      <description>Add --deliver to plain chat messages.</description>
+    </key>
+    <key name="max-recent-replies" type="u">
+      <default>8</default>
+      <range min="2" max="30"/>
+      <summary>Recent replies to keep</summary>
+      <description>Maximum number of messages shown in the dropdown history.</description>
+    </key>
+  </schema>
+</schemalist>
