@@ -1,0 +1,52 @@
+[
+  {
+    "name": "/help",
+    "description": "Ask the backend for command help or general usage guidance.",
+    "usage": "/help [topic]"
+  },
+  {
+    "name": "/model",
+    "description": "Switch or inspect the active model if the backend supports it.",
+    "usage": "/model <name>"
+  },
+  {
+    "name": "/system",
+    "description": "Send an instruction that should be interpreted as a system-level directive.",
+    "usage": "/system <instruction>"
+  },
+  {
+    "name": "/clear",
+    "description": "Request backend-side context reset while keeping local history intact.",
+    "usage": "/clear"
+  },
+  {
+    "name": "/reset",
+    "description": "Ask the backend to reset the current session or thread.",
+    "usage": "/reset"
+  },
+  {
+    "name": "/status",
+    "description": "Inspect backend/session status when supported.",
+    "usage": "/status"
+  },
+  {
+    "name": "/config",
+    "description": "Query or adjust backend configuration through slash-command forwarding.",
+    "usage": "/config <key> [value]"
+  },
+  {
+    "name": "/history",
+    "description": "Request backend-side history information.",
+    "usage": "/history"
+  },
+  {
+    "name": "/save",
+    "description": "Ask the backend to persist current work if it supports named sessions.",
+    "usage": "/save [name]"
+  },
+  {
+    "name": "/load",
+    "description": "Ask the backend to restore a saved session or preset.",
+    "usage": "/load <name>"
+  }
+]
