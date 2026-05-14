@@ -2,13 +2,12 @@ import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk?version=4.0';
 
-import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
-
-const DEFAULT_OPENCLAW_COMMAND = '/home/pratyush/n/bin/openclaw';
+// BUG FIX: lowercase 'shell' (was 'Shell') — caused silent import failure
+import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/shell/extensions/prefs.js';
 
 export default class OpenClawMiniChatPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
-        window.set_default_size(560, 420);
+        window.set_default_size(560, 480);
 
         const settings = this.getSettings();
 
@@ -28,8 +27,9 @@ export default class OpenClawMiniChatPreferences extends ExtensionPreferences {
             title: _('OpenClaw command'),
             text: settings.get_string('openclaw-command'),
         });
+        // Save '' on clear — extension falls back to built-in default
         commandRow.connect('changed', row => {
-            settings.set_string('openclaw-command', row.get_text().trim() || DEFAULT_OPENCLAW_COMMAND);
+            settings.set_string('openclaw-command', row.get_text().trim());
         });
         group.add(commandRow);
 
@@ -53,13 +53,14 @@ export default class OpenClawMiniChatPreferences extends ExtensionPreferences {
 
         const deliverRow = new Adw.SwitchRow({
             title: _('Deliver plain chat replies'),
-            subtitle: _('Adds --deliver to plain text agent turns. Slash commands are run exactly as typed.'),
+            subtitle: _('Adds --deliver to plain text agent turns.'),
         });
         settings.bind('deliver-agent-replies', deliverRow, 'active', Gio.SettingsBindFlags.DEFAULT);
         group.add(deliverRow);
 
         const maxRow = new Adw.SpinRow({
             title: _('Recent replies'),
+            subtitle: _('Maximum messages shown in history (2–30).'),
             adjustment: new Gtk.Adjustment({
                 lower: 2,
                 upper: 30,
@@ -70,5 +71,17 @@ export default class OpenClawMiniChatPreferences extends ExtensionPreferences {
         });
         settings.bind('max-recent-replies', maxRow, 'value', Gio.SettingsBindFlags.DEFAULT);
         group.add(maxRow);
+
+        const tips = new Adw.PreferencesGroup({ title: _('Keyboard shortcuts') });
+        page.add(tips);
+
+        tips.add(new Adw.ActionRow({
+            title: _('/ command palette'),
+            subtitle: _('Type / → filter live · ↑↓ navigate · Tab accept · Esc dismiss'),
+        }));
+        tips.add(new Adw.ActionRow({
+            title: _('Input history'),
+            subtitle: _('↑/↓ when palette is closed'),
+        }));
     }
 }
