@@ -2,7 +2,7 @@
   "uuid": "openclaw-mini-chat@local",
   "name": "OpenClaw Mini Chat",
   "description": "Panel dropdown for sending OpenClaw chat turns and running OpenClaw slash commands without a terminal.",
-  "version": 1,
+  "version": 3,
   "shell-version": ["45", "46", "47", "48", "49", "50"],
   "url": "https://docs.openclaw.ai/cli",
   "settings-schema": "org.gnome.shell.extensions.openclaw-mini-chat"
