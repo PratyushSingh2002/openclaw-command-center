@@ -1,137 +1,346 @@
-.openclaw-panel-label {
-  font-weight: 700;
-  padding: 0 4px;
+/* ═══════════════════════════════════════════════════════════════════════════
+   OpenClaw Mini Chat — stylesheet.css v3
+   Aesthetic: terminal-noir. Monospace precision. Subtle glow on active states.
+   Command palette slides in as an inline overlay replacing the chat view.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Panel button ─────────────────────────────────────────────────────────── */
+
+.oc-panel-label {
+  font-family: monospace;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 1px;
+  padding: 0 6px;
+  color: #7dd3fc;
 }
 
-.openclaw-menu {
-  min-width: 430px;
+/* ── Popup shell ──────────────────────────────────────────────────────────── */
+
+.oc-menu {
+  min-width: 460px;
 }
 
-.openclaw-wrapper-item {
+.oc-wrapper-item {
   padding: 0;
 }
 
-.openclaw-root {
-  spacing: 10px;
-  padding: 12px;
-  width: 430px;
+.oc-root {
+  spacing: 0;
+  padding: 0;
+  width: 460px;
+  background-color: #0c1117;
+  border: 1px solid rgba(125, 211, 252, 0.10);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.openclaw-header {
-  spacing: 12px;
-}
+/* ── Header ───────────────────────────────────────────────────────────────── */
 
-.openclaw-title {
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.openclaw-status {
-  font-size: 12px;
-  color: #9ca3af;
-}
-
-.openclaw-scroll {
-  min-height: 170px;
-  max-height: 270px;
-}
-
-.openclaw-history {
+.oc-header {
   spacing: 8px;
+  padding: 10px 14px 9px;
+  background-color: #111827;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-.openclaw-message {
-  border-radius: 8px;
-  padding: 8px 10px;
+.oc-dot {
+  font-size: 9px;
+  y-align: center;
 }
 
-.openclaw-message-system,
-.openclaw-message-reply {
-  background-color: rgba(70, 92, 118, 0.24);
+.oc-dot-idle {
+  color: #22c55e;
 }
 
-.openclaw-message-user {
-  background-color: rgba(46, 160, 104, 0.24);
+.oc-dot-busy {
+  color: #f59e0b;
 }
 
-.openclaw-message-error {
-  background-color: rgba(206, 73, 73, 0.24);
+.oc-title {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  color: #f1f5f9;
 }
 
-.openclaw-message-role {
+.oc-status {
+  font-family: monospace;
+  font-size: 10px;
+  color: #475569;
+  letter-spacing: 0.3px;
+}
+
+.oc-icon-button {
+  border-radius: 5px;
+  padding: 2px 7px;
+  font-size: 13px;
+  color: #64748b;
+  background-color: transparent;
+}
+
+.oc-icon-button:hover {
+  color: #f87171;
+  background-color: rgba(248, 113, 113, 0.10);
+}
+
+/* ── Chat history ─────────────────────────────────────────────────────────── */
+
+.oc-history-scroll {
+  min-height: 150px;
+  max-height: 240px;
+}
+
+.oc-history {
+  spacing: 5px;
+  padding: 10px 12px;
+}
+
+/* ── Messages ─────────────────────────────────────────────────────────────── */
+
+.oc-message {
+  border-radius: 6px;
+  padding: 7px 10px;
+}
+
+.oc-message-system {
+  background-color: transparent;
+  border-left: 2px solid #1e293b;
+  padding-left: 8px;
+  border-radius: 0;
+}
+
+.oc-message-reply {
+  background-color: rgba(56, 114, 175, 0.15);
+  border: 1px solid rgba(56, 114, 175, 0.20);
+}
+
+.oc-message-user {
+  background-color: rgba(34, 197, 94, 0.10);
+  border: 1px solid rgba(34, 197, 94, 0.18);
+}
+
+.oc-message-error {
+  background-color: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  border-left: 2px solid #ef4444;
+}
+
+.oc-message-hdr {
+  spacing: 6px;
+  margin-bottom: 3px;
+}
+
+.oc-message-role {
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #64748b;
+}
+
+.oc-message-time {
+  font-family: monospace;
+  font-size: 9px;
+  color: #334155;
+}
+
+.oc-copy-btn {
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 12px;
+  color: #475569;
+  background-color: transparent;
+}
+
+.oc-copy-btn:hover {
+  color: #94a3b8;
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.oc-message-text {
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+/* ── Command palette ──────────────────────────────────────────────────────── */
+
+.oc-palette {
+  border-top: 1px solid rgba(125, 211, 252, 0.12);
+}
+
+.oc-palette-header {
+  spacing: 8px;
+  padding: 7px 12px 6px;
+  background-color: rgba(125, 211, 252, 0.04);
+  border-bottom: 1px solid rgba(125, 211, 252, 0.08);
+}
+
+.oc-palette-title {
+  font-family: monospace;
   font-size: 11px;
   font-weight: 700;
-  color: #d1d5db;
+  color: #7dd3fc;
+  letter-spacing: 0.3px;
 }
 
-.openclaw-message-header {
-  spacing: 8px;
-}
-
-.openclaw-copy-button {
-  border-radius: 7px;
-  padding: 3px 8px;
-  font-size: 11px;
-  background-color: rgba(255, 255, 255, 0.08);
-}
-
-.openclaw-copy-button:hover,
-.openclaw-copy-button:focus {
-  background-color: rgba(255, 255, 255, 0.14);
-}
-
-.openclaw-message-text {
-  font-size: 12px;
-  color: #f3f4f6;
-}
-
-.openclaw-input-row {
-  spacing: 8px;
-}
-
-.openclaw-entry {
-  min-height: 34px;
-}
-
-.openclaw-send-button,
-.openclaw-stop-button {
+.oc-palette-count {
+  font-family: monospace;
+  font-size: 10px;
+  color: #334155;
+  background-color: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
-  padding: 7px 12px;
-  font-weight: 700;
+  padding: 1px 7px;
 }
 
-.openclaw-command-heading {
-  font-weight: 700;
-  font-size: 12px;
-  color: #d1d5db;
-}
-
-.openclaw-command-scroll {
-  min-height: 190px;
+.oc-palette-scroll {
+  min-height: 200px;
   max-height: 260px;
 }
 
-.openclaw-command-grid {
-  spacing: 6px;
+.oc-palette-list {
+  spacing: 1px;
+  padding: 4px 6px;
 }
 
-.openclaw-command-button {
-  border-radius: 8px;
-  padding: 7px 9px;
+.oc-palette-row {
+  border-radius: 6px;
+  padding: 0;
+  x-expand: true;
+  background-color: transparent;
+}
+
+.oc-palette-row:hover {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-.openclaw-command-button:hover,
-.openclaw-command-button:focus {
-  background-color: rgba(255, 255, 255, 0.11);
+/* Highlighted (keyboard nav) row */
+.oc-palette-row-selected {
+  background-color: rgba(125, 211, 252, 0.10);
+  border: 1px solid rgba(125, 211, 252, 0.18);
 }
 
-.openclaw-command-name {
-  font-weight: 700;
+.oc-palette-row-selected .oc-palette-cmd {
+  color: #7dd3fc;
+}
+
+.oc-palette-row-inner {
+  spacing: 0;
+  padding: 6px 9px;
+}
+
+.oc-palette-icon {
+  font-size: 14px;
+  min-width: 22px;
+  y-align: center;
+  color: #475569;
+}
+
+.oc-palette-row-selected .oc-palette-icon {
+  color: #7dd3fc;
+}
+
+.oc-palette-text {
+  spacing: 1px;
+  padding-left: 4px;
+}
+
+.oc-palette-cmd {
+  font-family: monospace;
   font-size: 12px;
+  font-weight: 700;
+  color: #e2e8f0;
 }
 
-.openclaw-command-description {
+.oc-palette-desc {
+  font-family: monospace;
+  font-size: 10px;
+  color: #475569;
+}
+
+.oc-palette-row-selected .oc-palette-desc {
+  color: #64748b;
+}
+
+.oc-palette-tab-hint {
+  font-family: monospace;
+  font-size: 10px;
+  color: #475569;
+  background-color: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  padding: 1px 5px;
+  y-align: center;
+}
+
+/* ── Input row ────────────────────────────────────────────────────────────── */
+
+.oc-input-row {
+  spacing: 6px;
+  padding: 8px 12px 10px;
+  background-color: #0f172a;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.oc-prompt {
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 900;
+  color: #22c55e;
+  y-align: center;
+  padding-bottom: 1px;
+}
+
+.oc-entry {
+  font-family: monospace;
+  font-size: 12px;
+  min-height: 30px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: #f1f5f9;
+  caret-color: #7dd3fc;
+}
+
+.oc-entry:focus {
+  border-color: rgba(125, 211, 252, 0.30);
+  background-color: rgba(125, 211, 252, 0.04);
+}
+
+.oc-send-button {
+  font-family: monospace;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 700;
   font-size: 11px;
-  color: #aeb6c2;
+  letter-spacing: 0.3px;
+  background-color: rgba(34, 197, 94, 0.20);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.oc-send-button:hover {
+  background-color: rgba(34, 197, 94, 0.32);
+  color: #86efac;
+}
+
+.oc-send-button:disabled {
+  opacity: 0.3;
+}
+
+.oc-stop-button {
+  font-family: monospace;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: 11px;
+  background-color: rgba(239, 68, 68, 0.20);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.oc-stop-button:hover {
+  background-color: rgba(239, 68, 68, 0.32);
 }
