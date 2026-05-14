@@ -1,5 +1,8 @@
 # OpenClaw Mini Chat
 
+
+![openclaw extension](<Screenshot From 2026-05-14 17-59-45.png>)
+
 GNOME Shell extension for interacting with OpenClaw from the top panel without opening a terminal.
 
 ## Features
