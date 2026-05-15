@@ -10,7 +10,10 @@ GNOME Shell extension for interacting with OpenClaw from the top panel without o
 - Adds an `OC` panel button with a dropdown mini chat.
 - Sends plain text as `openclaw --no-color agent --message "..." --agent main` by default.
 - Runs OpenClaw slash commands directly, for example `/status`, `/doctor`, or `/message send --target +15555550123 --message "Hi"`.
-- Shows recent replies in the dropdown and includes all top-level commands from `openclaw --help`.
+- Includes a live slash-command palette with keyboard navigation.
+- Supports `/models` plus a `/model <name>` shortcut that maps to `openclaw models set <name>`.
+- Shows command-completion GNOME notifications by default, with a settings toggle to disable them.
+- Shows recent replies in the dropdown and includes the current top-level commands from `openclaw --help`.
 - Includes preferences for the OpenClaw executable, default plain-chat agent, optional recipient, `--deliver`, and history length.
 
 ## Install locally
