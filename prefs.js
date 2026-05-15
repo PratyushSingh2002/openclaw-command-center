@@ -72,6 +72,13 @@ export default class OpenClawMiniChatPreferences extends ExtensionPreferences {
         settings.bind('max-recent-replies', maxRow, 'value', Gio.SettingsBindFlags.DEFAULT);
         group.add(maxRow);
 
+        const notificationsRow = new Adw.SwitchRow({
+            title: _('Command notifications'),
+            subtitle: _('Show a GNOME notification when a command completes or fails.'),
+        });
+        settings.bind('notify-command-results', notificationsRow, 'active', Gio.SettingsBindFlags.DEFAULT);
+        group.add(notificationsRow);
+
         const tips = new Adw.PreferencesGroup({ title: _('Keyboard shortcuts') });
         page.add(tips);
 
