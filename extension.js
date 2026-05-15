@@ -95,6 +95,16 @@ function timestamp() {
     return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
 }
 
+function summarizeForNotification(text) {
+    const singleLine = text.replace(/\s+/g, ' ').trim();
+    if (!singleLine)
+        return '';
+
+    return singleLine.length > 140
+        ? `${singleLine.slice(0, 137)}...`
+        : singleLine;
+}
+
 // ── Indicator ─────────────────────────────────────────────────────────────────
 
 const OpenClawIndicator = GObject.registerClass(
@@ -567,6 +577,7 @@ class OpenClawIndicator extends PanelMenu.Button {
     _run(argv) {
         this._setBusy(true);
         this._currentCancellable = new Gio.Cancellable();
+        const commandSummary = argv.slice(2).join(' ');
 
         const launcher = new Gio.SubprocessLauncher({
             flags: Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE,
@@ -580,6 +591,7 @@ class OpenClawIndicator extends PanelMenu.Button {
             this._currentCancellable = null;
             this._setBusy(false);
             this._appendMessage('error', `Could not start OpenClaw: ${error.message}`);
+            this._notifyCommandResult(false, commandSummary, `Could not start OpenClaw: ${error.message}`);
             return;
         }
 
@@ -601,6 +613,7 @@ class OpenClawIndicator extends PanelMenu.Button {
 
             const output = stripAnsi([stdout, stderr].filter(Boolean).join('\n'));
             this._appendMessage(ok ? 'reply' : 'error', output || (ok ? 'Done.' : 'OpenClaw exited without output.'));
+            this._notifyCommandResult(ok, commandSummary, output || (ok ? 'Done.' : stderr || 'OpenClaw exited without output.'));
         });
     }
 
@@ -693,6 +706,20 @@ class OpenClawIndicator extends PanelMenu.Button {
                 this._statusLabel.text = prev === _('copied ✓') ? _('ready') : prev;
             return GLib.SOURCE_REMOVE;
         });
+    }
+
+    _notifyCommandResult(ok, commandSummary, output) {
+        const title = ok ? 'OpenClaw command completed' : 'OpenClaw command failed';
+        const bodyParts = [];
+
+        if (commandSummary)
+            bodyParts.push(commandSummary);
+
+        const summary = summarizeForNotification(output);
+        if (summary)
+            bodyParts.push(summary);
+
+        Main.notify(title, bodyParts.join('\n'));
     }
 });
 
