@@ -20,12 +20,16 @@ const COMMANDS = [
     ['agents',     'Manage isolated agents',              '👥'],
     ['approvals',  'Manage exec approvals',               '✅'],
     ['backup',     'Create and verify backups',           '💾'],
+    ['capability', 'Run provider capability commands',    '🧪'],
     ['channels',   'Manage connected chat channels',      '📡'],
+    ['chat',       'Open a local terminal UI',            '💻'],
     ['clawbot',    'Legacy clawbot aliases',              '🦞'],
+    ['commitments','List and manage follow-up commitments','🧷'],
     ['completion', 'Generate shell completion',           '🔤'],
     ['config',     'Config get/set/unset/file/validate',  '🔧'],
     ['configure',  'Interactive configuration',           '🛠'],
     ['cron',       'Manage cron jobs',                    '⏱'],
+    ['crestodian', 'Open the setup and repair assistant', '🧭'],
     ['daemon',     'Gateway service alias',               '👻'],
     ['dashboard',  'Open the Control UI',                 '📊'],
     ['devices',    'Device pairing and tokens',           '📱'],
@@ -33,20 +37,24 @@ const COMMANDS = [
     ['dns',        'DNS discovery helpers',               '🌐'],
     ['docs',       'Search OpenClaw docs',                '📖'],
     ['doctor',     'Health checks and quick fixes',       '🩺'],
+    ['exec-policy','Show or sync exec policy',            '📜'],
     ['gateway',    'Gateway control',                     '🚪'],
     ['health',     'Fetch gateway health',                '💚'],
     ['help',       'Show OpenClaw help',                  '❓'],
     ['hooks',      'Manage internal hooks',               '🪝'],
+    ['infer',      'Run provider-backed model commands',  '🔮'],
     ['logs',       'Tail gateway logs',                   '📜'],
     ['mcp',        'Manage MCP config and bridge',        '🔌'],
     ['memory',     'Search and inspect memory',           '🧠'],
     ['message',    'Send, read, and manage messages',     '💬'],
+    ['migrate',    'Import state from another system',    '🧳'],
     ['models',     'Discover and configure models',       '🎯'],
     ['node',       'Manage node host service',            '🖥'],
     ['nodes',      'Manage gateway-owned nodes',          '🕸'],
     ['onboard',    'Run onboarding',                      '🚀'],
     ['pairing',    'Secure DM pairing',                   '🔒'],
     ['plugins',    'Manage plugins and extensions',       '🧩'],
+    ['proxy',      'Run the OpenClaw debug proxy',        '🛰'],
     ['qr',         'Generate pairing QR/setup code',      '📷'],
     ['reset',      'Reset local config/state',            '🔄'],
     ['sandbox',    'Manage sandbox containers',           '📦'],
@@ -58,6 +66,7 @@ const COMMANDS = [
     ['status',     'Show channel health',                 '📶'],
     ['system',     'Events, heartbeat, presence',         '💓'],
     ['tasks',      'Inspect background tasks',            '📝'],
+    ['terminal',   'Open a local terminal UI',            '🖥'],
     ['tui',        'Open terminal UI command',            '🖱'],
     ['uninstall',  'Uninstall service and local data',    '🗑'],
     ['update',     'Update OpenClaw',                     '⬆'],
@@ -95,6 +104,40 @@ function timestamp() {
     return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
 }
 
+function commandQueryForInput(text) {
+    if (!text.startsWith('/'))
+        return null;
+
+    const match = text.slice(1).match(/^[^\s]*/);
+    return (match?.[0] ?? '').toLowerCase();
+}
+
+function modelQueryForInput(text) {
+    const trimmed = text.trimStart();
+    if (!trimmed.startsWith('/model'))
+        return null;
+
+    if (trimmed === '/model')
+        return '';
+
+    if (!trimmed.startsWith('/model '))
+        return null;
+
+    const remainder = trimmed.slice('/model '.length).trim();
+    if (remainder.includes(' '))
+        return null;
+
+    return remainder.toLowerCase();
+}
+
+function modelNameFromAliasCommand(text) {
+    const trimmed = text.trim();
+    if (trimmed === '/model' || !trimmed.startsWith('/model '))
+        return '';
+
+    return trimmed.slice('/model '.length).trim();
+}
+
 function summarizeForNotification(text) {
     const singleLine = text.replace(/\s+/g, ' ').trim();
     if (!singleLine)
@@ -103,6 +146,58 @@ function summarizeForNotification(text) {
     return singleLine.length > 140
         ? `${singleLine.slice(0, 137)}...`
         : singleLine;
+}
+
+function parseKnownModels(output) {
+    const models = [];
+    const seen = new Set();
+    const lines = output.split('\n').map(line => line.trim()).filter(Boolean);
+
+    const addModel = (name, description, icon = '🎯') => {
+        const normalized = name.trim();
+        if (!normalized || seen.has(normalized))
+            return;
+
+        seen.add(normalized);
+        models.push({
+            name: normalized,
+            description,
+            icon,
+        });
+    };
+
+    const defaultLine = lines.find(line => line.startsWith('Default'));
+    const defaultModel = defaultLine?.split(':').slice(1).join(':').trim() ?? '';
+    if (defaultModel && defaultModel !== '-')
+        addModel(defaultModel, 'Current default model', '★');
+
+    const configuredLine = lines.find(line => line.startsWith('Configured models'));
+    if (configuredLine) {
+        const configuredModels = configuredLine.split(':').slice(1).join(':')
+            .split(',')
+            .map(item => item.trim())
+            .filter(Boolean);
+        for (const model of configuredModels)
+            addModel(model, model === defaultModel ? 'Current default model' : 'Configured model');
+    }
+
+    const aliasLine = lines.find(line => line.startsWith('Aliases'));
+    if (aliasLine) {
+        const aliases = aliasLine.split(':').slice(1).join(':')
+            .split(',')
+            .map(item => item.trim())
+            .filter(Boolean);
+
+        for (const aliasEntry of aliases) {
+            const [alias, target] = aliasEntry.split(/\s*->\s*/, 2);
+            if (!alias)
+                continue;
+
+            addModel(alias, target ? `Alias for ${target}` : 'Configured alias', '↪');
+        }
+    }
+
+    return models;
 }
 
 // ── Indicator ─────────────────────────────────────────────────────────────────
@@ -122,6 +217,7 @@ class OpenClawIndicator extends PanelMenu.Button {
         this._filterTimeout = null;
         this._selectedCommandIndex = -1;
         this._visibleCommands = [];
+        this._knownModels = [];
 
         this.add_child(new St.Label({
             text: 'OC',
@@ -285,6 +381,10 @@ class OpenClawIndicator extends PanelMenu.Button {
 
             // ↑/↓ while palette visible = navigate commands
             if (this._paletteBox.visible) {
+                if (key === Clutter.KEY_Return || key === Clutter.KEY_KP_Enter) {
+                    this._acceptPaletteSelection();
+                    return Clutter.EVENT_STOP;
+                }
                 if (key === Clutter.KEY_Up) {
                     this._movePaletteSelection(-1);
                     return Clutter.EVENT_STOP;
@@ -350,37 +450,70 @@ class OpenClawIndicator extends PanelMenu.Button {
     // ── Command Palette ──────────────────────────────────────────────────────
 
     _onInputChanged(text) {
-        if (text.startsWith('/')) {
-            const query = text.slice(1).toLowerCase();
-            // Only show palette before a space (while still typing the command name)
-            const hasArgs = query.includes(' ');
-            if (!hasArgs) {
-                const filtered = query.length === 0
-                    ? COMMANDS
-                    : COMMANDS.filter(([name, desc]) =>
-                        name.startsWith(query) || desc.toLowerCase().includes(query)
-                    );
-                this._showPalette(filtered, query);
-            } else {
-                this._hidePalette();
-            }
-        } else {
-            this._hidePalette();
+        const modelQuery = modelQueryForInput(text);
+        if (modelQuery !== null) {
+            this._showModelPalette(modelQuery);
+            return;
         }
+
+        const commandQuery = commandQueryForInput(text);
+        if (commandQuery === null) {
+            this._hidePalette();
+            return;
+        }
+
+        const filtered = commandQuery.length === 0
+            ? COMMANDS
+            : COMMANDS.filter(([name, desc]) =>
+                name.startsWith(commandQuery) || desc.toLowerCase().includes(commandQuery)
+            );
+        const items = filtered.map(([name, desc, icon]) => ({
+            title: `/${name}`,
+            description: desc,
+            icon,
+            fillText: `/${name} `,
+        }));
+        this._showPaletteItems(items, commandQuery.length > 0 ? `/${commandQuery}…` : _('All commands'), COMMANDS.length);
     }
 
-    _showPalette(commands, query) {
-        this._visibleCommands = commands;
-        this._selectedCommandIndex = commands.length > 0 ? 0 : -1;
+    _showModelPalette(query) {
+        let items;
+
+        if (this._knownModels.length === 0) {
+            items = [{
+                title: '/models',
+                description: 'Refresh the available model list from OpenClaw first',
+                icon: '↻',
+                fillText: '/models',
+            }];
+        } else {
+            items = this._knownModels
+                .filter(model => query.length === 0 || model.name.toLowerCase().includes(query))
+                .map(model => ({
+                    title: model.name,
+                    description: model.description,
+                    icon: model.icon,
+                    fillText: `/model ${model.name}`,
+                }));
+        }
+
+        const total = this._knownModels.length > 0 ? this._knownModels.length : items.length;
+        const title = query.length > 0 ? `/model ${query}…` : _('Select model');
+        this._showPaletteItems(items, title, total);
+    }
+
+    _showPaletteItems(items, title, totalCount) {
+        this._visibleCommands = items;
+        this._selectedCommandIndex = items.length > 0 ? 0 : -1;
         this._paletteList.destroy_all_children();
 
-        const count = commands.length;
-        this._paletteCount.text = count === COMMANDS.length ? `${count}` : `${count} / ${COMMANDS.length}`;
-        this._paletteTitle.text = query.length > 0 ? `/${query}…` : _('All commands');
+        const count = items.length;
+        this._paletteCount.text = count === totalCount ? `${count}` : `${count} / ${totalCount}`;
+        this._paletteTitle.text = title;
 
-        for (let i = 0; i < commands.length; i++) {
-            const [name, desc, icon] = commands[i];
-            this._paletteList.add_child(this._paletteRow(name, desc, icon, i));
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            this._paletteList.add_child(this._paletteRow(item, i));
         }
 
         this._paletteBox.visible = true;
@@ -396,20 +529,20 @@ class OpenClawIndicator extends PanelMenu.Button {
         this._selectedCommandIndex = -1;
     }
 
-    _paletteRow(name, desc, icon, index) {
+    _paletteRow(item, index) {
         const btn = new St.Button({
             can_focus: true,
             style_class: 'oc-palette-row',
             x_expand: true,
             reactive: true,
         });
-        btn._commandName = name;
+        btn._paletteItem = item;
         btn._commandIndex = index;
 
         const inner = new St.BoxLayout({ style_class: 'oc-palette-row-inner', x_expand: true });
 
         const iconLabel = new St.Label({
-            text: icon || '›',
+            text: item.icon || '›',
             style_class: 'oc-palette-icon',
             y_align: Clutter.ActorAlign.CENTER,
         });
@@ -417,12 +550,12 @@ class OpenClawIndicator extends PanelMenu.Button {
 
         const textCol = new St.BoxLayout({ vertical: true, x_expand: true, style_class: 'oc-palette-text' });
         textCol.add_child(new St.Label({
-            text: `/${name}`,
+            text: item.title,
             style_class: 'oc-palette-cmd',
             x_expand: true,
         }));
         textCol.add_child(new St.Label({
-            text: desc,
+            text: item.description,
             style_class: 'oc-palette-desc',
             x_expand: true,
         }));
@@ -444,7 +577,7 @@ class OpenClawIndicator extends PanelMenu.Button {
             this._updatePaletteSelection();
         });
         btn.connect('clicked', () => {
-            this._fillCommand(name);
+            this._fillPaletteItem(item);
         });
 
         return btn;
@@ -475,18 +608,16 @@ class OpenClawIndicator extends PanelMenu.Button {
 
     _acceptPaletteSelection() {
         if (this._selectedCommandIndex >= 0 && this._visibleCommands[this._selectedCommandIndex]) {
-            const [name] = this._visibleCommands[this._selectedCommandIndex];
-            this._fillCommand(name);
+            this._fillPaletteItem(this._visibleCommands[this._selectedCommandIndex]);
         }
     }
 
-    _fillCommand(name) {
-        const newText = `/${name} `;
+    _fillPaletteItem(item) {
+        const newText = item.fillText ?? item.title;
         this._entry.set_text(newText);
         this._entry.grab_key_focus();
         const len = newText.length;
         this._entry.clutter_text.set_selection(len, len);
-        this._hidePalette();
     }
 
     // ── Busy state ───────────────────────────────────────────────────────────
@@ -505,6 +636,13 @@ class OpenClawIndicator extends PanelMenu.Button {
     _submit() {
         const text = this._entry.get_text().trim();
         if (!text || this._currentProcess) return;
+
+        const modelQuery = modelQueryForInput(text);
+        const exactModelSelection = this._knownModels.some(model => `/model ${model.name}` === text);
+        if (modelQuery !== null && this._paletteBox.visible && (!modelQuery || !exactModelSelection)) {
+            this._acceptPaletteSelection();
+            return;
+        }
 
         let argv;
         try {
@@ -546,6 +684,11 @@ class OpenClawIndicator extends PanelMenu.Button {
         const binary = this._settings.get_string('openclaw-command').trim() || DEFAULT_OPENCLAW_COMMAND;
 
         if (text.startsWith('/')) {
+            const modelName = modelNameFromAliasCommand(text);
+            if (modelName) {
+                return [binary, '--no-color', 'models', 'set', modelName];
+            }
+
             const parts = shellSplit(text.slice(1));
             if (parts.length === 0)
                 throw new Error('Type a command after /. Try /help or /status.');
@@ -612,6 +755,7 @@ class OpenClawIndicator extends PanelMenu.Button {
             if (!this._historyBox) return;
 
             const output = stripAnsi([stdout, stderr].filter(Boolean).join('\n'));
+            this._captureKnownModels(commandSummary, output);
             this._appendMessage(ok ? 'reply' : 'error', output || (ok ? 'Done.' : 'OpenClaw exited without output.'));
             this._notifyCommandResult(ok, commandSummary, output || (ok ? 'Done.' : stderr || 'OpenClaw exited without output.'));
         });
@@ -708,15 +852,36 @@ class OpenClawIndicator extends PanelMenu.Button {
         });
     }
 
+    _captureKnownModels(commandSummary, output) {
+        if (commandSummary !== 'models')
+            return;
+
+        const parsedModels = parseKnownModels(output);
+        if (parsedModels.length > 0)
+            this._knownModels = parsedModels;
+    }
+
     _notifyCommandResult(ok, commandSummary, output) {
-        const title = ok ? 'OpenClaw command completed' : 'OpenClaw command failed';
+        if (!this._settings.get_boolean('notify-command-results'))
+            return;
+
+        let title = ok ? 'OpenClaw command completed' : 'OpenClaw command failed';
         const bodyParts = [];
 
-        if (commandSummary)
+        if (ok && commandSummary === 'models') {
+            title = 'OpenClaw models refreshed';
+            bodyParts.push(this._knownModels.length > 0
+                ? `${this._knownModels.length} models and aliases available`
+                : 'Model list refreshed');
+        } else if (ok && commandSummary.startsWith('models set ')) {
+            title = 'OpenClaw model switched';
+            bodyParts.push(commandSummary.slice('models set '.length).trim());
+        } else if (commandSummary) {
             bodyParts.push(commandSummary);
+        }
 
         const summary = summarizeForNotification(output);
-        if (summary)
+        if (summary && !bodyParts.includes(summary))
             bodyParts.push(summary);
 
         Main.notify(title, bodyParts.join('\n'));
