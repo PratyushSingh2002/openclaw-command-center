@@ -27,5 +27,10 @@
       <summary>Recent replies to keep</summary>
       <description>Maximum number of messages shown in the dropdown history.</description>
     </key>
+    <key name="notify-command-results" type="b">
+      <default>true</default>
+      <summary>Notify when commands finish</summary>
+      <description>Show a GNOME notification after OpenClaw commands complete or fail.</description>
+    </key>
   </schema>
 </schemalist>
