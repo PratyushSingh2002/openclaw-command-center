@@ -1,52 +1,67 @@
 [
   {
     "name": "/help",
-    "description": "Ask the backend for command help or general usage guidance.",
+    "description": "Show OpenClaw help or subcommand help.",
     "usage": "/help [topic]"
   },
   {
     "name": "/model",
-    "description": "Switch or inspect the active model if the backend supports it.",
+    "description": "Extension alias for `openclaw models set <name>`.",
     "usage": "/model <name>"
   },
   {
-    "name": "/system",
-    "description": "Send an instruction that should be interpreted as a system-level directive.",
-    "usage": "/system <instruction>"
-  },
-  {
-    "name": "/clear",
-    "description": "Request backend-side context reset while keeping local history intact.",
-    "usage": "/clear"
-  },
-  {
-    "name": "/reset",
-    "description": "Ask the backend to reset the current session or thread.",
-    "usage": "/reset"
+    "name": "/models",
+    "description": "List and inspect configured models and providers.",
+    "usage": "/models [status|list|scan|aliases|auth|fallbacks|set]"
   },
   {
     "name": "/status",
-    "description": "Inspect backend/session status when supported.",
+    "description": "Show gateway, channel, model, and recent-session status.",
     "usage": "/status"
   },
   {
+    "name": "/doctor",
+    "description": "Diagnose and repair common configuration or runtime issues.",
+    "usage": "/doctor [--fix]"
+  },
+  {
     "name": "/config",
-    "description": "Query or adjust backend configuration through slash-command forwarding.",
-    "usage": "/config <key> [value]"
+    "description": "Get, set, unset, or validate OpenClaw configuration.",
+    "usage": "/config <subcommand>"
   },
   {
-    "name": "/history",
-    "description": "Request backend-side history information.",
-    "usage": "/history"
+    "name": "/gateway",
+    "description": "Run, inspect, and query the OpenClaw Gateway.",
+    "usage": "/gateway <subcommand>"
   },
   {
-    "name": "/save",
-    "description": "Ask the backend to persist current work if it supports named sessions.",
-    "usage": "/save [name]"
+    "name": "/message",
+    "description": "Send, read, and manage channel messages.",
+    "usage": "/message <subcommand>"
   },
   {
-    "name": "/load",
-    "description": "Ask the backend to restore a saved session or preset.",
-    "usage": "/load <name>"
+    "name": "/plugins",
+    "description": "Install, enable, disable, and inspect plugins.",
+    "usage": "/plugins <subcommand>"
+  },
+  {
+    "name": "/skills",
+    "description": "List, inspect, and install agent skills.",
+    "usage": "/skills <subcommand>"
+  },
+  {
+    "name": "/tasks",
+    "description": "Inspect durable background tasks and flows.",
+    "usage": "/tasks [subcommand]"
+  },
+  {
+    "name": "/system",
+    "description": "System events, heartbeat, and presence tools.",
+    "usage": "/system <subcommand>"
+  },
+  {
+    "name": "/reset",
+    "description": "Reset local config and state while keeping the CLI installed.",
+    "usage": "/reset"
   }
 ]
